@@ -3,7 +3,7 @@ import { conversationRepository } from '../repositories/conversation.repository'
 const client = new OpenAI({
   apiKey: process.env.OPEN_AI_API_KEY,
 })
-
+// Annotate:
 type ChatResponse = {
   id: string
   message: string
