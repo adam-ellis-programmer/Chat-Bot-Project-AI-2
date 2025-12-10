@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import ChatBot from './components/ChatBot';
+import ChatBot from './components/chat/ChatBot';
 function App() {
   return (
-    <div className='h-screen p-4 w-2xl mx-auto'>
-      <ChatBot  />
+    <div className="h-screen p-4 w-2xl mx-auto">
+      <ChatBot />
     </div>
   );
 }
