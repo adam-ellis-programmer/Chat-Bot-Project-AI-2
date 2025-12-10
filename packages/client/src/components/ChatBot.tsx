@@ -22,6 +22,7 @@ type Message = {
 const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isBotTyping, setIsBotTyping] = useState(false);
+  const [error, setError] = useState('');
   const conversationId = useRef(crypto.randomUUID()); // create once and not change so use ref
   const { register, handleSubmit, reset, formState } = useForm<FormData>();
   const lastMessageRef = useRef<HTMLDivElement | null>(null);
@@ -32,19 +33,34 @@ const ChatBot = () => {
     }
   };
 
+  // < HTMLParagraphElement > generic type so we can access the element data in TS
+  function onCopyMessage(e: React.ClipboardEvent<HTMLParagraphElement>) {
+    const selection = window.getSelection()?.toString().trim();
+    if (selection) {
+      e.preventDefault();
+      e.clipboardData.setData('text/plain', selection);
+    }
+  }
   const onSubmit = async ({ prompt }: FormData) => {
-    // as soon as we press enter
-    setMessages((prev) => [...prev, { content: prompt, role: 'user' }]);
-    setIsBotTyping(true);
-    reset({ prompt: '' });
-    const { data } = await axios.post<ChatResponse>('/api/chat', {
-      prompt,
-      conversationId: conversationId.current,
-    });
+    try {
+      // as soon as we press enter
+      setError('')
+      setMessages((prev) => [...prev, { content: prompt, role: 'user' }]);
+      setIsBotTyping(true);
+      reset({ prompt: '' });
+      const { data } = await axios.post<ChatResponse>('/api/chat', {
+        prompt,
+        conversationId: conversationId.current,
+      });
 
-    // once we get response from server
-    setMessages((prev) => [...prev, { content: data.message, role: 'bot' }]);
-    setIsBotTyping(false);
+      // once we get response from server
+      setMessages((prev) => [...prev, { content: data.message, role: 'bot' }]);
+    } catch (error) {
+      console.log(error);
+      setError('Something Went Wrong! Please Try Again!');
+    } finally {
+      setIsBotTyping(false);
+    }
   };
 
   useEffect(() => {
@@ -79,6 +95,8 @@ const ChatBot = () => {
             <div className="w-2 h-2 bg-gray-800 rounded-full animate-bounce [animation-delay:0.4s]"></div>
           </div>
         )}
+
+        {error && <p className="text-red-500">{error}</p>}
       </div>
       <form
         onSubmit={handleSubmit(onSubmit)}
@@ -86,7 +104,7 @@ const ChatBot = () => {
         className="flex flex-col gap-2 items-end border-2 p-4 rounded-3xl"
       >
         <textarea
-        autoFocus
+          autoFocus
           className="w-full  focus:outline-0 resize-none"
           placeholder="Ask anything"
           maxLength={1000}
@@ -104,11 +122,3 @@ const ChatBot = () => {
 };
 
 export default ChatBot;
-// < HTMLParagraphElement > generic type so we can access the element data in TS
-function onCopyMessage(e: React.ClipboardEvent<HTMLParagraphElement>) {
-  const selection = window.getSelection()?.toString().trim();
-  if (selection) {
-    e.preventDefault();
-    e.clipboardData.setData('text/plain', selection);
-  }
-}
