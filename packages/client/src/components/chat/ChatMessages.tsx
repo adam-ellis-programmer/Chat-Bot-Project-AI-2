@@ -33,10 +33,10 @@ const ChatMessages = ({ messages }: props) => {
           onCopy={(e) => {
             onCopyMessage(e);
           }}
-          className={`px-3 py-1 rounded-xl   ${
+          className={`px-3 py-1 rounded-xl max-w-md  ${
             message.role === 'user'
               ? 'bg-blue-500 text-white self-end'
-              : 'bg-gray-100 text-black'
+              : 'bg-gray-100 text-black '
           }`}
           key={i}
         >

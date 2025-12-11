@@ -1,8 +1,20 @@
+import fs from 'fs'
+import path from 'path'
 import OpenAI from 'openai'
 import { conversationRepository } from '../repositories/conversation.repository'
+import template from '../prompts/chatbot.txt'
 const client = new OpenAI({
   apiKey: process.env.OPEN_AI_API_KEY,
 })
+
+// this is done once when this module is loaded and then we use once in the api request
+// not async (.. up one level)
+// prettier-ignore
+const parkInfo = fs.readFileSync(path.join(__dirname, '..', 'prompts', 'wonderworld.md'), 'utf-8')
+
+// pass instructions to the model
+const instructions = template.replace('{{parkInfo}}', parkInfo)
+
 // Annotate:
 type ChatResponse = {
   id: string
@@ -18,13 +30,15 @@ type ChatResponse = {
 // export the public interface
 // called a leaky abstraction
 // prettier-ignore
+
 export const chatService = {
   async sendMessage(prompt: string, conversationId: string): Promise<ChatResponse> {
     const response = await client.responses.create({
       model: 'gpt-4o-mini',
       input: prompt,
+      instructions,
       temperature: 0.2,
-      max_output_tokens: 100, // 100  tokens
+      max_output_tokens: 200, // 200  tokens
       previous_response_id:
         conversationRepository.getLastResponseId(conversationId), // last response of the conversation
     })
