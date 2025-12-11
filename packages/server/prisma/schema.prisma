@@ -12,3 +12,36 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  // opposite relationship
+  reviews     Review[]
+  summary     Summary?
+}
+
+// @id is primary key
+model Review {
+  id        Int      @id @default(autoincrement())
+  author    String
+  rating    Int
+  content   String
+  createdAt DateTime @default(now())
+  productId Int
+  // product id in this model references the id field in the product model
+  product   Product  @relation(fields: [productId], references: [id])
+}
+
+// Must define the opposite relationship
+model Summary {
+  id          Int      @id @default(autoincrement())
+  productId   Int      @unique
+  // references the id in the product model
+  prodcut     Product  @relation(fields: [productId], references: [id])
+  content     String
+  generatedAt DateTime @default(now())
+  expiresAt   DateTime
+}
