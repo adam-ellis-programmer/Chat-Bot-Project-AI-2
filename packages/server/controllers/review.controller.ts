@@ -1,6 +1,8 @@
 import type { Request, Response } from 'express'
 import { reviewService } from '../services/review.service'
 import OpenAI from 'openai'
+import { productRepository } from '../repositories/product.repository'
+import { reviewRepository } from '../repositories/review.repository'
 
 export const reviewController = {
   async getReviews(req: Request, res: Response) {
@@ -11,9 +13,14 @@ export const reviewController = {
     if (isNaN(productId)) {
       res.status(400).json({ error: 'Invalid Product Id!' })
     }
+    const reviews = await reviewRepository.getReviews(productId)
+    const summary = await reviewRepository.getReviewSummary(productId)
 
-    const reviews = await reviewService.getReviews(productId)
-    res.json(reviews)
+    res.json({
+      reviews,
+      // only return if there is a summary conditionally check
+      summary: summary && summary.expiresAt > new Date() ? summary.content : null,
+    })
   },
 
   async summarizeReviews(req: Request, res: Response) {
@@ -21,6 +28,20 @@ export const reviewController = {
 
     if (isNaN(productId)) {
       res.status(400).json({ error: 'Invalid Product Id!' })
+    }
+
+    // Edge Case: no product (wrong id)
+    const product = await productRepository.getProduct(productId)
+    if (!product) {
+      res.status(400).json({ error: 'Invalid Product' })
+      return
+    }
+    // for performance reasons we only fetch 1 review just to check
+    const reviews = await reviewRepository.getReviews(productId, 1)
+
+    if (!reviews.length) {
+      res.status(400).json({ error: 'There are no reviews to summarize' })
+      return
     }
 
     const summary = await reviewService.summarizeReviews(productId)
