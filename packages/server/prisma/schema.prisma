@@ -5,7 +5,7 @@
 // Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../generated/prisma"
 }
 
@@ -15,24 +15,28 @@ datasource db {
 
 model Product {
   id          Int      @id @default(autoincrement())
-  name        String
-  description String?
+  name        String   @db.VarChar(255)
+  description String?  @db.Text
   price       Float
   // opposite relationship
   reviews     Review[]
   summary     Summary?
+
+  @@map("products")
 }
 
 // @id is primary key
 model Review {
   id        Int      @id @default(autoincrement())
-  author    String
-  rating    Int
-  content   String
+  author    String   @db.VarChar(255)
+  rating    Int      @db.TinyInt
+  content   String   @db.Text
   createdAt DateTime @default(now())
   productId Int
   // product id in this model references the id field in the product model
   product   Product  @relation(fields: [productId], references: [id])
+
+  @@map("reviews")
 }
 
 // Must define the opposite relationship
@@ -41,7 +45,9 @@ model Summary {
   productId   Int      @unique
   // references the id in the product model
   prodcut     Product  @relation(fields: [productId], references: [id])
-  content     String
+  content     String   @db.Text
   generatedAt DateTime @default(now())
   expiresAt   DateTime
+
+  @@map("summaries")
 }

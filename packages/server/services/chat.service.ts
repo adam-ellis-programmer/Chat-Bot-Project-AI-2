@@ -1,11 +1,9 @@
 import fs from 'fs'
 import path from 'path'
-import OpenAI from 'openai'
+
 import { conversationRepository } from '../repositories/conversation.repository'
 import template from '../prompts/chatbot.txt'
-const client = new OpenAI({
-  apiKey: process.env.OPEN_AI_API_KEY,
-})
+import { llmClient } from '../llm/client'
 
 // this is done once when this module is loaded and then we use once in the api request
 // not async (.. up one level)
@@ -33,13 +31,13 @@ type ChatResponse = {
 
 export const chatService = {
   async sendMessage(prompt: string, conversationId: string): Promise<ChatResponse> {
-    const response = await client.responses.create({
+    const response = await llmClient.generateText({
       model: 'gpt-4o-mini',
-      input: prompt,
+       prompt,
       instructions,
       temperature: 0.2,
-      max_output_tokens: 200, // 200  tokens
-      previous_response_id:
+      maxTokens: 200, // 200  tokens
+      previousResponseId:
         conversationRepository.getLastResponseId(conversationId), // last response of the conversation
     })
 
@@ -54,7 +52,7 @@ export const chatService = {
     // return has to be platform agnostic -- [ONLY CHANGE HERE]
     return {
         id: response.id,
-        message: response.output_text
+        message: response.text
     }
   },
 }
