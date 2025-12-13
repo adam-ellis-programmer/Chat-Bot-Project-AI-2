@@ -13,13 +13,20 @@ export const reviewController = {
     if (isNaN(productId)) {
       res.status(400).json({ error: 'Invalid Product Id!' })
     }
+
+    const product = await productRepository.getProduct(productId)
+
+    if (!product) {
+      res.status(404).json({ message: 'Product does not exist!' })
+      return
+    }
+
     const reviews = await reviewRepository.getReviews(productId)
     const summary = await reviewRepository.getReviewSummary(productId)
 
     res.json({
       reviews,
-      // only return if there is a summary conditionally check
-      summary: summary && summary.expiresAt > new Date() ? summary.content : null,
+      summary,
     })
   },
 

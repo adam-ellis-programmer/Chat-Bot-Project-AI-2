@@ -16,8 +16,9 @@ export const reviewService = {
   async summarizeReviews(productId: number): Promise<string> {
     const existingSummary = await reviewRepository.getReviewSummary(productId)
     // Return Early if there is an existing summary and has not expired
-    if (existingSummary && existingSummary.expiresAt > new Date()) {
-      return existingSummary.content
+    //
+    if (existingSummary) {
+      return existingSummary
     }
 
     // Get the last 10 reviews (Better reflect accurate review and not expensive call)

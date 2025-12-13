@@ -34,18 +34,19 @@ export const reviewRepository = {
   },
 
   // Returns a promise but do not have to use async as returning straight away
-  getReviewSummary(productId: number) {
-    return prisma.summary.findFirst({
+  async getReviewSummary(productId: number): Promise<string | null> {
+    const summary = await prisma.summary.findFirst({
       where: {
         AND: [
           { productId },
           {
             expiresAt: {
-              gt: new Date(),
+              gt: new Date(), // translates to: Where expiresAt > current Day Time
             },
           },
         ],
       },
     })
+    return summary ? summary.content : null
   },
 }
