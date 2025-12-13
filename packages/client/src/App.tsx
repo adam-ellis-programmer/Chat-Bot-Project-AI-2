@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react';
+// import { useEffect, useState } from 'react';
 import ChatBot from './components/chat/ChatBot';
+import ReviewList from './components/reviews/ReviewList';
 function App() {
   return (
     <div className="h-screen p-4 w-2xl mx-auto">
-      <ChatBot />
+      {/* <ChatBot /> */}
+      <ReviewList productId={1} />
     </div>
   );
 }
