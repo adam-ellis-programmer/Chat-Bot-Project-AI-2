@@ -5,7 +5,7 @@ function App() {
   return (
     <div className="h-screen p-4 w-2xl mx-auto">
       {/* <ChatBot /> */}
-      <ReviewList productId={1} />
+      <ReviewList productId={2} />
     </div>
   );
 }
