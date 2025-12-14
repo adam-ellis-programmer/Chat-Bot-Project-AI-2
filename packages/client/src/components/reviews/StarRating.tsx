@@ -15,7 +15,7 @@ const StarRating = ({ value }: Props) => {
   return (
     // prettier-ignore
     <div className="flex gap-1 text-yellow-500">
-      {placeHolders.map((iteration, i) =>
+      {placeHolders.map((iteration) =>
         iteration <= value ? <FaStar key={iteration} /> : <FaRegStar key={iteration} />
       )}
     </div>
