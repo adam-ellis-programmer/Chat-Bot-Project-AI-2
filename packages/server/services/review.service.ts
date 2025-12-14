@@ -29,13 +29,14 @@ export const reviewService = {
 
     const prompt = template.replace('{{reviews}}', joinedReviews)
 
-    // no need to await (just return the promise)
-    const { text: summary } = await llmClient.generateText({
-      model: 'gpt-4.1',
-      prompt,
-      temperature: 0.2, // not creative but deterministic
-      maxTokens: 500,
-    })
+    // const { text: summary } = await llmClient.generateText({
+    //   model: 'gpt-4.1',
+    //   prompt,
+    //   temperature: 0.2, // not creative but deterministic
+    //   maxTokens: 500,
+    // })
+    //
+    const summary = await llmClient.summarize(joinedReviews)
 
     await reviewRepository.storeReviewSummary(productId, summary)
 
