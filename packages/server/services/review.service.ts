@@ -1,7 +1,7 @@
 // import { type Review } from '../generated/prisma/client'
 import { llmClient } from '../llm/client'
 import { reviewRepository } from '../repositories/review.repository'
-import template from '../prompts/summarize-reviews.txt'
+// import template from '../prompts/summarize-reviews.txt'
 // controller asks the service
 // the service asks the repository
 // service acts as a pass through
@@ -27,7 +27,7 @@ export const reviewService = {
     const joinedReviews = reviews.map((r) => r.content).join('\n\n')
     // Send to LLM for summarize
 
-    const prompt = template.replace('{{reviews}}', joinedReviews)
+    // const prompt = template.replace('{{reviews}}', joinedReviews)
 
     // const { text: summary } = await llmClient.generateText({
     //   model: 'gpt-4.1',
@@ -38,7 +38,7 @@ export const reviewService = {
     //
 
     // Swap out as needed
-    const summary = await llmClient.summarize(joinedReviews)
+    const summary = await llmClient.summarizeReviews(joinedReviews)
 
     await reviewRepository.storeReviewSummary(productId, summary)
 
