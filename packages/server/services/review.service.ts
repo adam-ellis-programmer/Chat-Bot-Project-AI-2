@@ -36,6 +36,8 @@ export const reviewService = {
     //   maxTokens: 500,
     // })
     //
+
+    // Swap out as needed
     const summary = await llmClient.summarize(joinedReviews)
 
     await reviewRepository.storeReviewSummary(productId, summary)
